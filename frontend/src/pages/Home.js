@@ -12,22 +12,57 @@ export default function Home() {
   const [stats,      setStats]      = useState({ total:0, resolved:0, users:0, today:0 });
   const [loading,    setLoading]    = useState(true);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const [pRes, cRes] = await Promise.all([
-          api.get('/problems?limit=6&sort=newest'),
-          api.get('/categories'),
-        ]);
-        setRecent(pRes.data.data);
-        setCategories(cRes.data.data);
-        const t = pRes.data.pagination.total;
-        setStats({ total:t, resolved:Math.round(t*0.31), users:Math.round(t*1.7), today:Math.round(t*0.04) });
-      } catch(e){ console.error(e); }
-      finally { setLoading(false); }
-    })();
-  }, []);
+ useEffect(() => {
+  const loadHome = async () => {
+    try {
+      const [pRes, cRes] = await Promise.all([
+        api.get('/problems?limit=6&sort=newest'),
+        api.get('/categories'),
+      ]);
 
+      // Safe extraction
+      const problems = Array.isArray(pRes?.data?.data)
+        ? pRes.data.data
+        : [];
+
+      const categoriesData = Array.isArray(cRes?.data?.data)
+        ? cRes.data.data
+        : [];
+
+      const total =
+        typeof pRes?.data?.pagination?.total === "number"
+          ? pRes.data.pagination.total
+          : problems.length;
+
+      setRecent(problems);
+      setCategories(categoriesData);
+
+      setStats({
+        total,
+        resolved: Math.round(total * 0.31),
+        users: Math.round(total * 1.7),
+        today: Math.round(total * 0.04),
+      });
+
+    } catch (err) {
+      console.error("Home page API error:", err);
+
+      // Prevent React from crashing
+      setRecent([]);
+      setCategories([]);
+      setStats({
+        total: 0,
+        resolved: 0,
+        users: 0,
+        today: 0,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  loadHome();
+}, []);
   return (
     <div style={s.page}>
       {/* Hero */}
