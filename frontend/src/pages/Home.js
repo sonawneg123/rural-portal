@@ -106,27 +106,61 @@ export default function Home() {
 
       {/* Categories */}
       <section style={s.section}>
-        <div style={s.sHead}><h2 style={s.sTitle}>Browse by Category</h2><Link to="/problems" style={s.seeAll}>See all →</Link></div>
-        <div style={s.catGrid}>
-          {categories.map((c) => (
-            <Link key={c.id} to={`/problems?category_id=${c.id}`} style={s.catCard}>
-              <div style={{ ...s.catIcon, background: c.color+'22' }}>
-                <span style={{ fontSize:22 }}>{CAT_EMOJI[c.name]||'📋'}</span>
-              </div>
-              <span style={s.catName}>{c.name}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
+       <div style={s.sHead}>
+  <h2 style={s.sTitle}>Browse by Category</h2>
+  <Link to="/problems" style={s.seeAll}>
+    See all →
+  </Link>
+</div>
 
-      {/* Recent */}
-      <section style={s.section}>
-        <div style={s.sHead}><h2 style={s.sTitle}>Recent Reports</h2><Link to="/problems" style={s.seeAll}>View all →</Link></div>
-        {loading
-          ? <div style={s.loading}>Loading…</div>
-          : <div style={s.grid}>{recent.map((p) => <ProblemCard key={p.id} problem={p}/>)}</div>
-        }
+<div style={s.catGrid}>
+  {Array.isArray(categories) &&
+    categories.map((c) => (
+      <Link
+        key={c.id}
+        to={`/problems?category_id=${c.id}`}
+        style={s.catCard}
+      >
+        <div
+          style={{
+            ...s.catIcon,
+            background: `${c.color}22`,
+          }}
+        >
+          <span style={{ fontSize: 22 }}>
+            {CAT_EMOJI[c.name] || "📋"}
+          </span>
+        </div>
+
+        <span style={s.catName}>{c.name}</span>
+      </Link>
+    ))}
+</div>
       </section>
+{/* Recent */}
+<section style={s.section}>
+  <div style={s.sHead}>
+    <h2 style={s.sTitle}>Recent Reports</h2>
+    <Link to="/problems" style={s.seeAll}>
+      View all →
+    </Link>
+  </div>
+
+  {loading ? (
+    <div style={s.loading}>Loading...</div>
+  ) : (
+    <div style={s.grid}>
+      {Array.isArray(recent) &&
+        recent.map((p) => (
+          <ProblemCard
+            key={p.id}
+            problem={p}
+          />
+        ))}
+    </div>
+  )}
+</section>
+    
 
       {/* AI Feature Banner */}
       <section style={s.aiBanner}>
